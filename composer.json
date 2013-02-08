@@ -1,0 +1,20 @@
+{
+	"name": "cloudmanic/database",
+	"description": "A simple query builder for mysql.",
+	"keywords": ["mysql", "query builder", "orm"],
+	"homepage": "https://cloudmanic.com",
+	"license": "MIT",
+	"authors": [
+	{
+		"name": "Spicer Matthews",
+		"homepage": "http://spicermatthews.com"
+ 	}],
+	"version": "1.0.0",
+	"require": {
+		"php": ">=5.3"
+	},
+	
+	"autoload": {
+		"psr-0": {"CMS": "src/"}
+	}
+}
