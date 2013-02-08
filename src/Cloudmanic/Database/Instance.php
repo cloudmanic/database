@@ -5,9 +5,9 @@
 // Date: 1/07/2013
 //
 
-namespace Cloudmanic\WarChest\Libraries;
+namespace Cloudmanic\Database;
 
-class Database
+class Instance
 {
 	private $_table = null;
 	private $_db_conn = null;

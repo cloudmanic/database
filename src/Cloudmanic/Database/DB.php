@@ -5,7 +5,7 @@
 // Date: 1/07/2013
 //
 
-namespace Cloudmanic;
+namespace Cloudmanic\Database;
 
 class DB
 {
@@ -33,7 +33,7 @@ class DB
 	{
 		if(! self::$i)
 		{
-			self::$i = new Database(self::$_host, self::$_user, self::$_pass, self::$_db);
+			self::$i = new Instance(self::$_host, self::$_user, self::$_pass, self::$_db);
 		}
         
 		return self::$i;
