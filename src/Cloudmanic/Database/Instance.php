@@ -17,6 +17,7 @@ class Instance
 	private $_db = '';
 	private $_query = '';
 	private $_query_log = array();
+	private $_wheres = array();
 
 	
 	//
@@ -42,6 +43,14 @@ class Instance
 		return $this;
 	}
 	
+	//
+	// Set col.
+	//
+	public function set_col($key, $val)
+	{
+		$this->_wheres[$key] = $val;
+	}
+	
 	// ---------------- Getters ---------------- //
 	
 	// 
@@ -60,15 +69,33 @@ class Instance
 	public function get()
 	{
 		$this->_query = "SELECT * FROM $this->_table";
+		
+		// Add Wheres.
+		if(count($this->_wheres))
+		{
+			$this->_query .= ' WHERE ';
+			foreach($this->_wheres AS $key => $row)
+			{
+				$this->_query .= "$key = '$row' ";
+			}
+		}
+		
+		// Set query log.
 		$this->_query_log[] = $this->_query;
 
+		// Make query.
 		if($stmt = $this->_db_conn->query($this->_query))
 		{
-			return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+			$data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		} else
 		{
-			return array();
+			$data = array();
 		}
+		
+		// Clear.
+		$this->clear();
+		
+		return $data;
 	}
 	
 	//
@@ -92,7 +119,51 @@ class Instance
 		// Get the insert id.
 		$id = $this->_db_conn->lastInsertId();
 		
+		// Clear.
+		$this->clear();
+		
 		return ($id) ? $id : 0;
+	}
+	
+	//
+	// Delete....
+	//
+	public function delete()
+	{
+		$this->_query = "DELETE FROM $this->_table";
+		
+		// Add Wheres.
+		if(count($this->_wheres))
+		{
+			$this->_query .= ' WHERE ';
+			foreach($this->_wheres AS $key => $row)
+			{
+				$this->_query .= "$key = '$row' ";
+			}
+		}
+		
+		// Set query log.
+		$this->_query_log[] = $this->_query;
+
+		// Make query.
+		if($stmt = $this->_db_conn->query($this->_query))
+		{
+			return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		} else
+		{
+			return array();
+		}
+		
+		// Clear.
+		$this->clear();
+	}
+	
+	//
+	// Clear query variables.
+	//
+	public function clear()
+	{
+		$this->_wheres = array();
 	}
 }
 
