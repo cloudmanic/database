@@ -4,6 +4,7 @@
 	"keywords": ["mysql", "query builder", "orm"],
 	"homepage": "https://cloudmanic.com",
 	"license": "MIT",
+	"minimum-stability": "dev",
 	"authors": [
 	{
 		"name": "Spicer Matthews",
