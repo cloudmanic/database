@@ -18,6 +18,7 @@ class Instance
 	private $_query = '';
 	private $_query_log = array();
 	private $_wheres = array();
+	private $_wheres_not = array();
 
 	
 	//
@@ -29,7 +30,13 @@ class Instance
 		$this->_user = $user;
 		$this->_pass = $pass;
 		$this->_db = $db;
-		$this->_db_conn = new \PDO("mysql:host=$this->_host;dbname=$this->_db", $this->_user, $this->_pass);
+		
+		try {
+			$this->_db_conn = new \PDO("mysql:host=$this->_host;dbname=$this->_db", $this->_user, $this->_pass);
+			$this->_db_conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING);
+		} catch(\PDOException $e) {
+			echo 'ERROR: ' . $e->getMessage();
+		}
 	}
 	
 	// ---------------- Setters ----------------- //
@@ -49,6 +56,16 @@ class Instance
 	public function set_col($key, $val)
 	{
 		$this->_wheres[$key] = $val;
+		return $this;
+	}
+	
+	//
+	// Set not col.
+	//
+	public function set_not_col($key, $val)
+	{
+		$this->_wheres_not[$key] = $val;
+		return $this;
 	}
 	
 	// ---------------- Getters ---------------- //
@@ -64,19 +81,43 @@ class Instance
 	// ---------------- Queries ---------------- //	
 
 	//
+	// Get by id (SELECT).
+	//
+	public function get_by_id($id)
+	{
+		static::set_col($this->_table . 'Id', $id);
+		$data = static::get();
+		return (isset($data[0])) ? $data[0] : false;
+	}
+
+	//
 	// Get.... (SELECT).
 	//
 	public function get()
 	{
 		$this->_query = "SELECT * FROM $this->_table";
 		
+		// Add Where to the query.		
+		if(count($this->_wheres) || count($this->_wheres_not))
+		{
+			$this->_query .= ' WHERE ';
+		}
+		
 		// Add Wheres.
 		if(count($this->_wheres))
 		{
-			$this->_query .= ' WHERE ';
 			foreach($this->_wheres AS $key => $row)
 			{
 				$this->_query .= "$key = '$row' ";
+			}
+		}
+		
+		// Add Where nots.
+		if(count($this->_wheres_not))
+		{
+			foreach($this->_wheres_not AS $key => $row)
+			{
+				$this->_query .= "$key != '$row' ";
 			}
 		}
 		
@@ -131,14 +172,28 @@ class Instance
 	public function delete()
 	{
 		$this->_query = "DELETE FROM $this->_table";
+
+		// Add Where to the query.		
+		if(count($this->_wheres) || count($this->_wheres_not))
+		{
+			$this->_query .= ' WHERE ';
+		}
 		
 		// Add Wheres.
 		if(count($this->_wheres))
 		{
-			$this->_query .= ' WHERE ';
 			foreach($this->_wheres AS $key => $row)
 			{
 				$this->_query .= "$key = '$row' ";
+			}
+		}
+		
+		// Add Where nots.
+		if(count($this->_wheres_not))
+		{
+			foreach($this->_wheres_not AS $key => $row)
+			{
+				$this->_query .= "$key != '$row' ";
 			}
 		}
 		
@@ -164,7 +219,42 @@ class Instance
 	public function clear()
 	{
 		$this->_wheres = array();
+		$this->_wheres_not = array();
 	}
+	
+	// ---------------- Helper Queries ---------------- //	
+	
+	//
+	// Return the database connection.
+	//
+	public function get_connection()
+	{
+		return $this->_db_conn;
+	}
+	
+	//
+	// Make a raw query.
+	//
+	public function query($sql)
+	{
+		return $this->_db_conn->query($sql);
+	}
+	
+	//
+	// Get list of all tables in the database.
+	//
+	public function list_tables()
+	{	
+		$tables = array();
+		$stmt = $this->_db_conn->query("SHOW TABLES");
+		$all = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		foreach($all AS $key => $row)
+		{
+			$tables[] = current($row);
+		}
+		return $tables;
+	}
+
 }
 
 /* End File */
