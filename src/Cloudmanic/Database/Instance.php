@@ -19,6 +19,7 @@ class Instance
 	private $_query_log = array();
 	private $_wheres = array();
 	private $_wheres_not = array();
+	private $_selects = array();
 
 	
 	//
@@ -40,6 +41,14 @@ class Instance
 	}
 	
 	// ---------------- Setters ----------------- //
+	
+	//
+	// Set selects.
+	//
+	public function set_select($select)
+	{
+		$this->_selects[] = $select;
+	}
 	
 	// 
 	// Set table.
@@ -95,7 +104,16 @@ class Instance
 	//
 	public function get()
 	{
-		$this->_query = "SELECT * FROM $this->_table";
+		// Set the selects.
+		if(count($this->_selects) > 0)
+		{
+			$selects = implode(',', $this->_selects);
+		} else
+		{
+			$selects = '*';
+		}
+	
+		$this->_query = "SELECT $selects FROM $this->_table";
 		
 		// Add Where to the query.		
 		if(count($this->_wheres) || count($this->_wheres_not))
@@ -220,6 +238,7 @@ class Instance
 	{
 		$this->_wheres = array();
 		$this->_wheres_not = array();
+		$this->_selects = array();
 	}
 	
 	// ---------------- Helper Queries ---------------- //	
