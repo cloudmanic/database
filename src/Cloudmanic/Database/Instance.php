@@ -219,12 +219,10 @@ class Instance
 		$this->_query_log[] = $this->_query;
 
 		// Make query.
-		if($stmt = $this->_db_conn->query($this->_query))
-		{
-			return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-		} else
-		{
-			return array();
+		try {
+			$this->_db_conn->exec($this->_query);
+		} catch(\PDOException $e) {
+			echo 'ERROR: ' . $e->getMessage();
 		}
 		
 		// Clear.
