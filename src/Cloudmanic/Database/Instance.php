@@ -124,9 +124,17 @@ class Instance
 		// Add Wheres.
 		if(count($this->_wheres))
 		{
+			$c = 1;
 			foreach($this->_wheres AS $key => $row)
 			{
 				$this->_query .= "$key = '$row' ";
+				
+				if((count($this->_wheres) > 1) && ($c < count($this->_wheres)))
+				{
+					$this->_query .= "AND ";
+				}
+				
+				$c++;
 			}
 		}
 		
@@ -200,9 +208,17 @@ class Instance
 		// Add Wheres.
 		if(count($this->_wheres))
 		{
+			$c = 1;
 			foreach($this->_wheres AS $key => $row)
 			{
 				$this->_query .= "$key = '$row' ";
+				
+				if((count($this->_wheres) > 1) && ($c < count($this->_wheres)))
+				{
+					$this->_query .= "AND ";
+				}
+				
+				$c++;
 			}
 		}
 		
