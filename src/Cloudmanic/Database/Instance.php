@@ -20,7 +20,7 @@ class Instance
 	private $_wheres = array();
 	private $_wheres_not = array();
 	private $_selects = array();
-
+  private $_order = '';
 	
 	//
 	// Set db connection.
@@ -58,6 +58,15 @@ class Instance
 		$this->_table = $table;
 		return $this;
 	}
+  
+  //
+  // Set order
+  //
+  public function set_order($col, $d = 'ASC')
+  {
+    $this->_order = ' ORDER BY ' . $col . ' ' . $d;
+    return $this;
+  }        
 	
 	//
 	// Set col.
@@ -146,6 +155,9 @@ class Instance
 				$this->_query .= "$key != '$row' ";
 			}
 		}
+		
+    // Add Order By
+    $this->_query .= $this->_order;		
 		
 		// Set query log.
 		$this->_query_log[] = $this->_query;
